@@ -21,6 +21,8 @@ public class HelloControllerTest {
 
     @Test
     void testSayHello() throws Exception {
+        System.out.println("Hello");
+
         String expectedResult = "Hello World!!";
         mockMvc.perform(MockMvcRequestBuilders.get("/api/hello"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
