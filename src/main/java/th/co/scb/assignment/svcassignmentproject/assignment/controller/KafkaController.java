@@ -9,6 +9,7 @@ import th.co.scb.assignment.svcassignmentproject.assignment.service.Producer;
 
 @RestController
 @RequestMapping(value = "/kafka")
+
 public class KafkaController {
 
     private final Producer producer;

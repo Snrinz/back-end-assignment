@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService{
     public void deleteDataById(int userId) {
         Optional<User> result = userRepository.findById(userId);
         if (result.isPresent()) {
-            new UserNotFoundException(String.valueOf(userId));
+            throw new UserNotFoundException(String.valueOf(userId));
         }
 
         userRepository.deleteById(userId);

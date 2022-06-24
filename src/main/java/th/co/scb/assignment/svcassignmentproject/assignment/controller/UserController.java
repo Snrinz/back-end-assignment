@@ -1,12 +1,14 @@
 package th.co.scb.assignment.svcassignmentproject.assignment.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 import th.co.scb.assignment.svcassignmentproject.assignment.data.User;
 import th.co.scb.assignment.svcassignmentproject.assignment.exception.UserInformationRequired;
 import th.co.scb.assignment.svcassignmentproject.assignment.service.UserServiceImpl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -34,7 +36,7 @@ public class UserController {
 
     @GetMapping("/users/{userId}")
     public User findById(@PathVariable int userId) {
-        if (userId < 0) {
+        if (userId <= 0) {
             throw new IllegalArgumentException("Invalid input: " + userId);
         }
 
@@ -42,13 +44,23 @@ public class UserController {
     }
 
     @GetMapping("/users")
+    @Cacheable
     public List<User> getAllData() {
         return userService.getAllData();
     }
 
+    @GetMapping("/emails")
+    @Cacheable
+    public List<String> getAllUsersEmails() {
+        return userService.getAllData()
+                .parallelStream()
+                .map(user -> user.getEmail())
+                .collect(Collectors.toList());
+    }
+
     @PutMapping("/users/{userId}")
     public User updateAllDataById(@PathVariable int userId, @RequestBody User user) {
-        if (userId < 0) {
+        if (userId <= 0) {
             throw new IllegalArgumentException("Invalid input: " + userId);
         }
 
@@ -64,7 +76,7 @@ public class UserController {
 
     @PatchMapping("/users/{userId}")
     public User updatePartialDataById(@PathVariable int userId, @RequestBody User user) {
-        if (userId < 0) {
+        if (userId <= 0) {
             throw new IllegalArgumentException("Invalid input: " + userId);
         }
 
@@ -77,7 +89,7 @@ public class UserController {
 
     @DeleteMapping("/users/{userId}")
     public void deleteDataById(@PathVariable int userId) {
-        if (userId < 0) {
+        if (userId <= 0) {
             throw new IllegalArgumentException("Invalid input: " + userId);
         }
 
