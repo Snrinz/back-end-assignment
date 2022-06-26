@@ -26,6 +26,6 @@ public class ProducerTest {
     void sendMessage() {
         when(kafkaTemplate.send(any(), any())).thenReturn(mock(ListenableFuture.class));
         producer.sendMessage("Hello Test");
-        verify(producer).sendMessage(any());
+        verify(kafkaTemplate).send(any(), any());
     }
 }

@@ -13,9 +13,13 @@ import th.co.scb.assignment.svcassignmentproject.assignment.repository.UserRepos
 import th.co.scb.assignment.svcassignmentproject.assignment.service.UserService;
 import th.co.scb.assignment.svcassignmentproject.assignment.service.UserServiceImpl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceImplTest {
@@ -47,10 +51,55 @@ public class UserServiceImplTest {
     }
 
     @Test
-    void testCreateDataUnsuccessfullyWithNullEmail() {
-        UserNotFoundException expectedException = new UserNotFoundException(String.valueOf(mockUserWithName.getId()));
-        when(userRepository.save(mockUserWithName)).thenThrow(expectedException);
-        assertThrows(UserNotFoundException.class, () -> userService.createData(mockUserWithName));
+    void testFindByIdSuccessfully() {
+        when(userRepository.findById(mockUserWithNameAndEmail.getId())).thenReturn(Optional.ofNullable(mockUserWithNameAndEmail));
+        User actualResult = userService.findById(mockUserWithNameAndEmail.getId());
+        assertSame(mockUserWithNameAndEmail, actualResult);
+    }
+
+    @Test
+    void testFindByIdUnsuccessfully() {
+        UserNotFoundException expectedException = new UserNotFoundException(String.valueOf(777));
+        when(userRepository.findById(mockUserWithNameAndEmail.getId())).thenThrow(expectedException);
+        assertThrows(UserNotFoundException.class, () -> userService.findById(mockUserWithNameAndEmail.getId()));
+    }
+
+    @Test
+    void testGetAllData() {
+        ArrayList<User> expectedList = new ArrayList<>() {
+            {
+                add(mockUserWithNameAndEmail);
+                add(mockUserWithName);
+            }
+        };
+
+        when(userRepository.findAll()).thenReturn(expectedList);
+        assertSame(expectedList, userService.getAllData());
+    }
+
+    @Test
+    void testUpdateDataSuccessfully() {
+        User updatedUser = new User(mockUserWithNameAndEmail.getName(), "updatedEmail@gmail.com");
+        updatedUser.setId(mockUserWithNameAndEmail.getId());
+        when(userRepository.save(updatedUser)).thenReturn(updatedUser);
+        User actualResult = userService.updateData(updatedUser.getId(), updatedUser);
+        assertSame(updatedUser, actualResult);
+    }
+
+    @Test
+    void testUpdatePartialData() {
+        User updatedUser = new User(mockUserWithNameAndEmail.getName(), null);
+        updatedUser.setId(mockUserWithNameAndEmail.getId());
+        when(userRepository.save(updatedUser)).thenReturn(updatedUser);
+        User actualResult = userService.updateData(updatedUser.getId(), updatedUser);
+        assertSame(updatedUser, actualResult);
+    }
+
+    @Test
+    void testDeleteDataByIdSuccessfully() {
+        doNothing().when(userRepository).deleteById(mockUserWithNameAndEmail.getId());
+        userService.deleteDataById(mockUserWithNameAndEmail.getId());
+        verify(userRepository).deleteById(any());
     }
 
 }
